@@ -2,6 +2,7 @@ import streamlit as st
 from dotenv import load_dotenv
 
 def main():
+    load_dotenv()
     st.set_page_config(page_title='chat with pdfs', page_icon=':books:')
     st.header('chat with multiple pdfs :books:')
     st.text_input("ask a question about Isaac Asimov's Sci-Fi Universe*:")
