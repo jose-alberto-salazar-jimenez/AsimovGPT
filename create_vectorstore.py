@@ -8,13 +8,42 @@ from langchain.embeddings.huggingface import HuggingFaceInstructEmbeddings
 from langchain_openai.embeddings import OpenAIEmbeddings
 #from langchain.vectorstores import faiss
 #from langchain_community.vectorstores import FAISS
-from langchain.vectorstores.faiss import FAISS
+#from langchain.vectorstores.mongodb_atlas import  MongoDBAtlasVectorSearch #FAISS
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
 #from langchain.llms import openai
 #from langchain.chat_models import ChatOpenAI
 from langchain_openai import ChatOpenAI
 from html_template import css, bot_template, user_template
+
+from pymongo import MongoClient
+from langchain_community.vectorstores.mongodb_atlas import  MongoDBAtlasVectorSearch
+from langchain_community.document_loaders import PyPDFLoader
+
+
+#-----------------------------------------------
+
+# BACK-END PARAMETERS
+backend_params = {
+    'RECREATE_EMBEDDINGS':False #True, #False,
+    'OVERRIDE_VECTORSTORE':False #True, #False
+    'DBNAME':'123',
+}
+
+#-----------------------------------------------
+
+# PDF FILES LOCATION FOR TEXT EXTRACTION
+pdf1 = 'pdf_data/wikipedia_isaac_asimov.pdf'
+pdf2 = 'pdf_data/wikipedia_psychohistory_fictional.pdf'
+pdf3 = 'pdf_data/'
+pdf4 = 'pdf_data/'
+pdf5 = 'pdf_data/'
+pdf6 = 'pdf_data/'
+pdf7 = 'pdf_data/the_complete_asimov.pdf'
+
+pdf_docs = [pdf1]
+
+#-----------------------------------------------
 
 
 def get_pdf_text(pdf_docs):
@@ -42,47 +71,41 @@ def get_text_chunks(text):
 
 
 def get_vectorstore(text_chunks):
-    """Embeddings..
+    """Creates Embeddings from Text Chunks and save them in a Vetor Store
     """
-    embeddings = OpenAIEmbeddings()
-    #embeddings = HuggingFaceInstructEmbeddings(model_name='hkunlp/instructor-xl')
-    #embeddings = HuggingFaceInstructEmbeddings(model_name='hkunlp/instructor-base')
-    vectorstore = FAISS.from_texts(texts=text_chunks, embedding=embeddings)
-    return vectorstore
+    if backend_params['RECREATE_EMBEDDINGS']:
+        embeddings = OpenAIEmbeddings(openai_api_key='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')#, temperature=0.1)
+    if backend_params['OVERRIDE_VECTORSTORE']:
+        #pass
+        #vectorstore = FAISS.from_texts(texts=text_chunks, embedding=embeddings)
+        conn_string = 'mongodb+srv://jasj1991:hvC36CUIq7tq3jZE@cluster-asimovgpt.jbwpf6l.mongodb.net/'
+        print('here1')
+        client = MongoClient(conn_string)
+        collection = client['asimovgpt_db']['asimovgpt_embeddings']
+        print('here2')
+        # Insert the documents in MongoDB Atlas with their embedding
+        #docsearch = MongoDBAtlasVectorSearch.from_documents(
+        #    docs, embeddings, collection=collection, index_name=index_name
+        #)
+        vectorstore = MongoDBAtlasVectorSearch.from_texts(text_chunks, embeddings, collection=collection)
+        #text_chunks, embeddings, collection=collection#, index_name=index_name)
+        print('here3')
+    #return vectorstore
 
 
-def get_conversation_chain(vectorstore):
-    """
-    """
-    llm = ChatOpenAI()
-    #llm = HuggingFaceHub(repo_id="google/flan-t5-xxl", model_kwargs={"temperature":0.5, "max_length":512})
-    memory = ConversationBufferMemory(memory_key='chat_history', return_messages=True)
-    conversation_chain = ConversationalRetrievalChain.from_llm(
-        llm=llm,
-        retriever=vectorstore.as_retriever(),
-        memory = memory
-    )
-    return conversation_chain
+def main():
+
+    # get pdf text
+    raw_text = get_pdf_text(pdf_docs)
+
+    # get the text chunks
+    text_chunks = get_text_chunks(raw_text)
+
+    # create vector store
+    vectorstore = get_vectorstore(text_chunks)
 
 
 
-def handle_userinput(user_question):
-    """Saves chat history in session, and displays input/output messages.
-    """
-    response = st.session_state.conversation({'question': user_question})
-    st.session_state.chat_history = response['chat_history']
 
-    #for i, message in enumerate(st.session_state.chat_history):
-    #    if i % 2 == 0:
-    #        st.write(user_template.replace(
-    #            "{{MSG}}", message.content), unsafe_allow_html=True)
-    #    else:
-    #        st.write(bot_template.replace(
-    #            "{{MSG}}", message.content), unsafe_allow_html=True)
-
-    human_history = [message for i, message in enumerate(st.session_state.chat_history) if i % 2 == 0][::-1][:10] 
-    bot_history = [message for i, message in enumerate(st.session_state.chat_history) if i % 2 == 1][::-1][:10] 
-
-    for h, b in zip(human_history, bot_history):
-        st.write(user_template.replace("{{MSG}}", h.content), unsafe_allow_html=True)
-        st.write(bot_template.replace("{{MSG}}", b.content), unsafe_allow_html=True)
+if __name__=='__main__':
+    main()
