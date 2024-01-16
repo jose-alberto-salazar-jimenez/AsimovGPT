@@ -74,11 +74,11 @@ def get_vectorstore(text_chunks):
     """Creates Embeddings from Text Chunks and save them in a Vetor Store
     """
     if backend_params['RECREATE_EMBEDDINGS']:
-        embeddings = OpenAIEmbeddings(openai_api_key='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')#, temperature=0.1)
+        embeddings = OpenAIEmbeddings(openai_api_key='')#, temperature=0.1)
     if backend_params['OVERRIDE_VECTORSTORE']:
         #pass
         #vectorstore = FAISS.from_texts(texts=text_chunks, embedding=embeddings)
-        conn_string = 'mongodb+srv://jasj1991:hvC36CUIq7tq3jZE@cluster-asimovgpt.jbwpf6l.mongodb.net/'
+        conn_string = ''
         print('here1')
         client = MongoClient(conn_string)
         collection = client['asimovgpt_db']['asimovgpt_embeddings']

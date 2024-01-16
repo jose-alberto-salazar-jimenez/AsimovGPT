@@ -4,7 +4,7 @@ from langchain_openai import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
 
-conn_string = 'mongodb+srv://jasj1991:hvC36CUIq7tq3jZE@cluster-asimovgpt.jbwpf6l.mongodb.net/'
+conn_string = ''
 print('here1')
 #client = MongoClient(conn_string)
 #collection = client['asimovgpt_db']['asimovgpt_embeddings']
@@ -13,7 +13,7 @@ print('here1')
 vector_search = MongoDBAtlasVectorSearch.from_connection_string(
     conn_string,
     'asimov_db'+ "." + 'asimov_embeddings',
-    OpenAIEmbeddings(openai_api_key='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', disallowed_special=()),
+    OpenAIEmbeddings(openai_api_key='', disallowed_special=()),
     #index_name=ATLAS_VECTOR_SEARCH_INDEX_NAME,
 )
 
@@ -35,7 +35,7 @@ print(results)
 #    print(result)
 
 
-llm = ChatOpenAI(openai_api_key='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')
+llm = ChatOpenAI(openai_api_key='')
 #    #llm = HuggingFaceHub(repo_id="google/flan-t5-xxl", model_kwargs={"temperature":0.5, "max_length":512})
 #    memory = ConversationBufferMemory(memory_key='chat_history', return_messages=True)
 conversation_chain = ConversationalRetrievalChain.from_llm(
