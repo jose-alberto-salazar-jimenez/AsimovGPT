@@ -1,48 +1,15 @@
-import streamlit as st
 from dotenv import load_dotenv
 from PyPDF2 import PdfReader
 from langchain.text_splitter import CharacterTextSplitter
-#from langchain.embeddings import HuggingFaceInstructEmbeddings
-from langchain.embeddings.huggingface import HuggingFaceInstructEmbeddings
-#from langchain_community.embeddings.openai import OpenAIEmbeddings
 from langchain_openai.embeddings import OpenAIEmbeddings
-#from langchain.vectorstores import faiss
-#from langchain_community.vectorstores import FAISS
-#from langchain.vectorstores.mongodb_atlas import  MongoDBAtlasVectorSearch #FAISS
-from langchain.memory import ConversationBufferMemory
-from langchain.chains import ConversationalRetrievalChain
-#from langchain.llms import openai
-#from langchain.chat_models import ChatOpenAI
-from langchain_openai import ChatOpenAI
-from html_template import css, bot_template, user_template
-
-from pymongo import MongoClient
 from langchain_community.vectorstores.mongodb_atlas import  MongoDBAtlasVectorSearch
-from langchain_community.document_loaders import PyPDFLoader
-
+from pymongo import MongoClient
+from os import getenv
+from pdf_docs_list import pdf_docs
 
 #-----------------------------------------------
-
 # BACK-END PARAMETERS
-backend_params = {
-    'RECREATE_EMBEDDINGS':False #True, #False,
-    'OVERRIDE_VECTORSTORE':False #True, #False
-    'DBNAME':'123',
-}
-
-#-----------------------------------------------
-
-# PDF FILES LOCATION FOR TEXT EXTRACTION
-pdf1 = 'pdf_data/wikipedia_isaac_asimov.pdf'
-pdf2 = 'pdf_data/wikipedia_psychohistory_fictional.pdf'
-pdf3 = 'pdf_data/'
-pdf4 = 'pdf_data/'
-pdf5 = 'pdf_data/'
-pdf6 = 'pdf_data/'
-pdf7 = 'pdf_data/the_complete_asimov.pdf'
-
-pdf_docs = [pdf1]
-
+EXECUTE_EMBEDDING_TO_VECTORSTORE_PROCESS=False #True
 #-----------------------------------------------
 
 
@@ -70,42 +37,45 @@ def get_text_chunks(text):
     return chunks
 
 
-def get_vectorstore(text_chunks):
+def save_vectorstore(text_chunks):
     """Creates Embeddings from Text Chunks and save them in a Vetor Store
     """
-    if backend_params['RECREATE_EMBEDDINGS']:
-        embeddings = OpenAIEmbeddings(openai_api_key='')#, temperature=0.1)
-    if backend_params['OVERRIDE_VECTORSTORE']:
-        #pass
-        #vectorstore = FAISS.from_texts(texts=text_chunks, embedding=embeddings)
-        conn_string = ''
-        print('here1')
-        client = MongoClient(conn_string)
-        collection = client['asimovgpt_db']['asimovgpt_embeddings']
-        print('here2')
-        # Insert the documents in MongoDB Atlas with their embedding
-        #docsearch = MongoDBAtlasVectorSearch.from_documents(
-        #    docs, embeddings, collection=collection, index_name=index_name
-        #)
-        vectorstore = MongoDBAtlasVectorSearch.from_texts(text_chunks, embeddings, collection=collection)
-        #text_chunks, embeddings, collection=collection#, index_name=index_name)
-        print('here3')
-    #return vectorstore
+    if EXECUTE_EMBEDDING_TO_VECTORSTORE_PROCESS:
+        
+        # create embeddings using OpenAI service/api
+        openai_embeddings = OpenAIEmbeddings(getenv('OPENAI_API_KEY'))
+        
+        # insert embeddings to mongodb collection (a.k.a vectorstore) 
+        mongodb_client = MongoClient(getenv('MONGO_URI'))
+
+        MongoDBAtlasVectorSearch.from_texts(
+            texts = text_chunks, 
+            embedding = openai_embeddings, 
+            collection = mongodb_client['asimovgpt_db']['openai_embedding'],
+           index_name='embedding_vector_index'
+        )
 
 
 def main():
 
-    # get pdf text
-    raw_text = get_pdf_text(pdf_docs)
+    # load .env variables (api keys)
+    load_dotenv()
+
+    # get raw text from pdf docs
+    text_raw = get_pdf_text(pdf_docs)
 
     # get the text chunks
-    text_chunks = get_text_chunks(raw_text)
+    text_chunks = get_text_chunks(text_raw)
 
-    # create vector store
-    vectorstore = get_vectorstore(text_chunks)
-
-
+    # create vectorstore
+    vectorstore = save_vectorstore(text_chunks)
 
 
 if __name__=='__main__':
-    main()
+    if EXECUTE_EMBEDDING_TO_VECTORSTORE_PROCESS:
+        main()
+    else:
+        print("#####################")
+        print("# Note: If you want to run the 'Embedding to Vectorstore' process, you have to change the parameter 'EXECUTE_EMBEDDING_TO_VECTORSTORE_PROCESS' to 'True'...")
+        print("# WARNING: Doing this could represent a cost, giving that this uses OpenAI and MongoDB services...")
+        print("#####################")
