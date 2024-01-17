@@ -2,10 +2,10 @@
 import streamlit as st
 from dotenv import load_dotenv
 from pymongo import mongo_client
-from langchain.vectorstores.mongodb_atlas import MongoDBAtlasVectorSearch
+from langchain_community.vectorstores.mongodb_atlas import MongoDBAtlasVectorSearch
 from langchain_openai.embeddings import OpenAIEmbeddings
 
-from os import getenv
+import os
 load_dotenv()
 
 import tempfile
@@ -14,7 +14,7 @@ from langchain.chat_models import ChatOpenAI
 #from langchain.document_loaders import PyPDFLoader
 from langchain.memory import ConversationBufferMemory
 from langchain.memory.chat_message_histories import StreamlitChatMessageHistory
-from langchain.embeddings import HuggingFaceEmbeddings
+#from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.callbacks.base import BaseCallbackHandler
 from langchain.chains import ConversationalRetrievalChain
 #from langchain.vectorstores import DocArrayInMemorySearch
@@ -48,7 +48,7 @@ def configure_retriever(uploaded_files):
     #retriever = vectordb.as_retriever(search_type="mmr", search_kwargs={"k": 2, "fetch_k": 4})
 
     vectorstore = MongoDBAtlasVectorSearch.from_connection_string(
-            connection_string=getenv('MONGO_URI'),
+            connection_string=os.getenv('MONGO_URI'),
             namespace='asimovgpt_db'+ "." + 'openai_embedding',
             embedding=OpenAIEmbeddings(disallowed_special=()),
             index_name='openai_embedding_vector_index',
