@@ -29,17 +29,20 @@ font-size: 16px;
 bot_template = '''
 <div class="chat-message bot">
     <div class="avatar">
-        <img src="https://i.pinimg.com/736x/78/c5/da/78c5da9e83b843f4f64d08d3d95ae9c4.jpg">
+        <img src="images_jpg/bot_avatar.jpg">
     </div>
     <div class="message">{{MSG}}</div>
 </div>
 '''
+# <img src="https://i.pinimg.com/736x/78/c5/da/78c5da9e83b843f4f64d08d3d95ae9c4.jpg">
 
 user_template = '''
 <div class="chat-message user">
     <div class="avatar">
-        <img src="https://i.pinimg.com/736x/56/0e/5c/560e5ce944d0ae2cb83d4fea78003fb4.jpg">
+        <img src="images_jpg/user_avatar.jpg">
     </div>    
     <div class="message">{{MSG}}</div>
 </div>
 '''
+
+# <img src="https://i.pinimg.com/736x/56/0e/5c/560e5ce944d0ae2cb83d4fea78003fb4.jpg">

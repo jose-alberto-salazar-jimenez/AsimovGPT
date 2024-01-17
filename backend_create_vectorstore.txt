@@ -1,3 +1,11 @@
+# The code below to create a vectorstore (vector db) in MongoDB from OpenAI embeddings using pdf files.
+# Copy and paste on a '.py' file and run it...
+# Note: you will require your own OPEANAI and MongoDB API KEYS... stored in a '.env' file.
+# Note: If you want to run the 'Embedding to Vectorstore' process, you have to change the parameter 'EXECUTE_EMBEDDING_TO_VECTORSTORE_PROCESS' to 'True'..."
+# WARNING: Doing this could represent a cost, giving that this uses OpenAI and MongoDB services..."
+
+#-------------------------------------------------------------------------------
+
 from dotenv import load_dotenv
 from PyPDF2 import PdfReader
 from langchain.text_splitter import CharacterTextSplitter
@@ -79,3 +87,5 @@ if __name__=='__main__':
         print("# Note: If you want to run the 'Embedding to Vectorstore' process, you have to change the parameter 'EXECUTE_EMBEDDING_TO_VECTORSTORE_PROCESS' to 'True'...")
         print("# WARNING: Doing this could represent a cost, giving that this uses OpenAI and MongoDB services...")
         print("#####################")
+
+#-------------------------------------------------------------------------------
