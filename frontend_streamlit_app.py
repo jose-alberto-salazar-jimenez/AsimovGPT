@@ -95,11 +95,15 @@ llm = ChatOpenAI(
     temperature=0.1, #0, 
     streaming=True
 )
+
+
+
+
 qa_chain = ConversationalRetrievalChain.from_llm(
     llm, 
     retriever=retriever, 
     memory=memory, 
-    verbose=False #True
+    verbose=False, #True
 )
 
 if len(msgs.messages) == 0 or st.sidebar.button("Clear message history"):

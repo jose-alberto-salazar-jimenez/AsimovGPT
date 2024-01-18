@@ -16,6 +16,7 @@ pdf_docs = [
     'pdf_docs/1989 Nemesis Asimov Fandom.pdf',
     'pdf_docs/1993 Forward the Foundation Asimov Fandom.pdf',
     'pdf_docs/asimov_the_last_question.pdf',
+    'pdf_docs/common_questions_to_boot.pdf',
     'pdf_docs/fandom_foundation_universe_timeline.pdf',
     'pdf_docs/wikipedia_empire_series.pdf',
     'pdf_docs/wikipedia_foundation_series.pdf',

@@ -6,13 +6,13 @@
 
 #-------------------------------------------------------------------------------
 
-from dotenv import load_dotenv
 from PyPDF2 import PdfReader
 from langchain.text_splitter import CharacterTextSplitter
 from langchain_openai.embeddings import OpenAIEmbeddings
 from langchain_community.vectorstores.mongodb_atlas import  MongoDBAtlasVectorSearch
 from pymongo import MongoClient
-from os import getenv
+from dotenv import load_dotenv
+import os
 from pdf_docs_list import pdf_docs
 
 #-----------------------------------------------
@@ -28,7 +28,7 @@ def get_pdf_text(pdf_docs):
     for pdf in pdf_docs:
         pdf_reader = PdfReader(pdf)
         for page in pdf_reader.pages:
-            text += page.extract_text()    
+            text += page.extract_text()  
     return text
 
 
@@ -51,11 +51,11 @@ def save_vectorstore(text_chunks):
     if EXECUTE_EMBEDDING_TO_VECTORSTORE_PROCESS:
         
         # create embeddings using OpenAI service/api
-        openai_embeddings = OpenAIEmbeddings(getenv('OPENAI_API_KEY'))
+        openai_embeddings = OpenAIEmbeddings(os.getenv('OPENAI_API_KEY'))
         
         # insert embeddings to mongodb collection (a.k.a vectorstore) 
-        mongodb_client = MongoClient(getenv('MONGO_URI'))
-
+        mongodb_client = MongoClient(os.getenv('MONGO_URI'))
+        print('here6')
         MongoDBAtlasVectorSearch.from_texts(
             texts = text_chunks, 
             embedding = openai_embeddings, 
@@ -76,7 +76,7 @@ def main():
     text_chunks = get_text_chunks(text_raw)
 
     # create vectorstore
-    vectorstore = save_vectorstore(text_chunks)
+    save_vectorstore(text_chunks)
 
 
 if __name__=='__main__':
