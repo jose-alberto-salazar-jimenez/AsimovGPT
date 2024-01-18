@@ -1,50 +1,41 @@
-
 import streamlit as st
-from dotenv import load_dotenv
-from pymongo import mongo_client
 from langchain_community.vectorstores.mongodb_atlas import MongoDBAtlasVectorSearch
 from langchain_openai.embeddings import OpenAIEmbeddings
-
-import os
-load_dotenv()
-
-#import tempfile
-#import streamlit as st
 #from langchain.chat_models import ChatOpenAI
 #from langchain_community.chat_models import ChatOpenAI
 from langchain_openai import ChatOpenAI
-#from langchain.document_loaders import PyPDFLoader
 from langchain.memory import ConversationBufferMemory
 from langchain_community.chat_message_histories import StreamlitChatMessageHistory
 #from langchain.memory.chat_message_histories import StreamlitChatMessageHistory
-#from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.callbacks.base import BaseCallbackHandler
 from langchain.chains import ConversationalRetrievalChain
-#from langchain.vectorstores import DocArrayInMemorySearch
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+import os
+from dotenv import load_dotenv
+#from pymongo import mongo_client
+
+load_dotenv()
 
 st.set_page_config(page_title="AsimovGPT", page_icon="🚀")
+
 #st.title("Asimov's Foundation Universe GPT 🚀", help='You can ask questions related to the Foundation Universe (Robots Galactic Empire and Foundation Series) of Isaac Asimov. He was the "GOAT" of Sci-Fi... trust me, I am AI.')
 st.title("Asimov's GPT 🚀", help='You can make queries related to the Foundation Universe (Robots Galactic Empire and Foundation Series) of Isaac Asimov. He was the "GOAT" of Sci-Fi... trust me, I am AI.')
 
-user_query_count = 0 #- to count number of queries made
-#------------------
-#def configure_retriever(uploaded_files):
+user_query_count = 0 # to count number of queries made.
 
-@st.cache_resource(ttl="1h")
+
+@st.cache_resource(ttl="1h") # to hold session for 1 hour.
 def configure_retriever():
-    
     vectorstore = MongoDBAtlasVectorSearch.from_connection_string(
             connection_string=os.getenv('MONGO_URI'),
             namespace='asimovgpt_db'+ "." + 'openai_embedding',
             embedding=OpenAIEmbeddings(disallowed_special=()),
             index_name='openai_embedding_vector_index',
-        )
-        
+        ) 
     retriever = vectorstore.as_retriever()
 
     return retriever
-#------------------
+
 
 class StreamHandler(BaseCallbackHandler):
     def __init__(self, container: st.delta_generator.DeltaGenerator, initial_text: str = ""):
@@ -88,8 +79,6 @@ class StreamHandler(BaseCallbackHandler):
 
 openai_api_key = os.getenv('OPENAI_API_KEY')
 
-
-
 retriever = configure_retriever()
 
 # Setup memory for contextual conversation
@@ -130,10 +119,12 @@ if user_query := st.chat_input(placeholder="Ask me anything related to the Found
         stream_handler = StreamHandler(st.empty())
         #response = qa_chain.run(user_query, callbacks=[stream_handler]) #callbacks=[retrieval_handler, stream_handler])
         #response = qa_chain.invoke(user_query, callbacks=[stream_handler])
-        response = qa_chain.run(user_query, callbacks=[stream_handler])
+        response = qa_chain.run(user_query, callbacks=[stream_handler]) # apparently .run is deprecated, and .invoke should be used, but .invoke doesnt work properly.
 
 
 #user_query_count = len([msg.content for msg in msgs.messages if msg.type=='human'])
 user_query_count = len([1 for msg in msgs.messages if msg.type=='human'])
-st.sidebar.write('You have made ', str(user_query_count), ' queries so far.')
+
+if user_query_count>0:
+    st.sidebar.write('You have made ', str(user_query_count), ' queries so far.')
 
