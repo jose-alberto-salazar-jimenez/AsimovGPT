@@ -30,4 +30,4 @@ Finally, one has to give credit where credit's due. The main sources used were:
 - [MongoDB Documentation](https://www.mongodb.com/docs/)
 - [Streamlit Documentation](https://docs.streamlit.io/get-started)
 
-This people/sources are awesome.
+These people/sources are awesome.
