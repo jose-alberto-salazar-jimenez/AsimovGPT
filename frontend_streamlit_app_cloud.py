@@ -8,7 +8,7 @@ from langchain_openai.embeddings import OpenAIEmbeddings
 import os
 load_dotenv()
 
-import tempfile
+#import tempfile
 #import streamlit as st
 from langchain.chat_models import ChatOpenAI
 #from langchain.document_loaders import PyPDFLoader
@@ -26,7 +26,7 @@ st.title("🦜 LangChain: Chat with Documents")
 
 @st.cache_resource(ttl="1h")
 def configure_retriever(uploaded_files):
-    # Read documents
+    # Read documentssk-yNSSuYi56hwrz2WhC2qOT3BlbkFJOSVoVhKItaNG1C6PRyaP
     #docs = []
     #temp_dir = tempfile.TemporaryDirectory()
     #for file in uploaded_files:
@@ -44,7 +44,7 @@ def configure_retriever(uploaded_files):
     #embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
     #vectordb = DocArrayInMemorySearch.from_documents(splits, embeddings)
 
-    # Define retriever
+    # Define retrieversk-yNSSuYi56hwrz2WhC2qOT3BlbkFJOSVoVhKItaNG1C6PRyaP
     #retriever = vectordb.as_retriever(search_type="mmr", search_kwargs={"k": 2, "fetch_k": 4})
 
     vectorstore = MongoDBAtlasVectorSearch.from_connection_string(
