@@ -1,6 +1,7 @@
 # requirements.txt
 langchain==0.1.0
 langchain-community==0.0.12
+langchain-openai==langchain_openai
 openai==1.7.2
 PyPDF2==3.0.1
 pymongo==4.6.1
